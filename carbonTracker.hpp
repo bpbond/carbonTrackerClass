@@ -39,9 +39,8 @@ using namespace std;
     /**
       *\brief parameterized constructor - useful for initializing fluxes with predetermined maps -
               ONLY FOR USE WITHIN CPP NOT FOR GENERAL USE TO AVOID INITIALIZATION ISSUES
-      *\param totalCarbon unitval (units pg C) that expresses total amount of carbon in the pool
-      *\param origin_frax pointer to a double array - usually the originFracs array of the pool the flux is leaving
-      * \return CarbonTracker object with totalCarbon set and an array set equal to the pointer object
+      *\param totC unitval (units pg C) that expresses total amount of carbon in the pool
+      *\param pool_map pointer to a double array - usually the originFracs array of the pool the flux is leaving
       */
     CarbonTracker(Hector::unitval totC, double* pool_map);
 
@@ -49,10 +48,8 @@ using namespace std;
 
     /**
       *\brief parameterized constructor - initialize pools of carbon with pg carbon (unitvals)
-      *\param totalCarbon unitval (units pg C) that expresses total amount of carbon in the pool
-      *\param key Pool object to set as inital origin of carbon in the pool at time of creation
-      * \return CarbonTracker object with totalCarbon set and an array of all zeros except for the the index of key,
-      *  which is set to 1
+      *\param totC unitval (units pg C) that expresses total amount of carbon in the pool
+      *\param subPool Pool object to set as inital origin of carbon in the pool at time of creation
       */
     CarbonTracker(Hector::unitval totC, Pool subPool);
 
@@ -62,8 +59,7 @@ using namespace std;
     /**
       * \brief copy constructor
       * \param ct reference to carbon tracker to be copied
-      * \returns CarbonTracker object deep copied from ct created by copy constructor
-      */ 
+      */
     CarbonTracker(const CarbonTracker &ct);
 
     /**
@@ -128,7 +124,7 @@ using namespace std;
 
     /**
       * \brief getter for indiviudal key-value pairs within a CarbonTracker map object
-      * \param MultiKey object
+      * \param origin Origin pool
       * \return value associated with key param, if no key matches returns 0
       */ 
     Hector::unitval getPoolCarbon(Pool origin);
@@ -203,6 +199,6 @@ using namespace std;
     * \param ct CarbonTracker object with unitval (pg C) total carbon and valid map
     * \return CarbonTracker object with (ct totalCarbon)/d and unchanged map 
     */ 
-  CarbonTracker operator/(CarbonTracker&, const double);
+  CarbonTracker operator/(CarbonTracker& ct, const double d);
 
 #endif
