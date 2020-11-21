@@ -345,11 +345,12 @@ int main(int argc, char* argv[]){
     CT2 y(carbon20, "y");
     y.setTracking(true);
     CT2 z = x + y;
+        
     cout << "x is " << x << endl;
     cout << "y is " << y << endl;
     cout << "z is " << z << endl;
     z = z - carbon10;
-    cout << "z is " << z << endl;
+    cout << "z=z-10 is " << z << endl;
     CT2 z2 = z / 2;
     cout << "z/2 is " << z2 << endl;
     CT2 zpoint5 = z2 * 0.5;
@@ -357,6 +358,18 @@ int main(int argc, char* argv[]){
     const CT2 test = z;
     CT2 twoxz = 2.0 * test;
     cout << "2 * z is " << twoxz << endl;
+    
+    CT2 dest(carbon10, "dest");
+    dest.setTracking(true);
+    for(int i = 0; i < 5; i++) {
+        CT2 flux = z * 0.1;
+        z = z - flux;
+        dest = dest + flux;
+        cout << "----------------- i = " << i << endl;
+        cout << "z = " << z << endl;
+        cout << "flux = " << flux << endl;
+        cout << "dest = " << dest << endl;
+    }
     
     cout << "Time for Tests!" << endl;
     testTrackerStartsFalse();

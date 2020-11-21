@@ -21,13 +21,14 @@ public:
     // math operations
     CT2 operator+(const CT2& flux);
     CT2 operator-(const Hector::unitval flux);
+    CT2 operator-(const CT2& ct);
     CT2 operator*(const double d);  // note corresponding non-member function declared below
     CT2 operator/(const double d);
 
     // accessor functions
     vector<string> get_sources() const;
     double get_fraction(std::string source) const;
-    double get_total() const;
+    Hector::unitval get_total() const;
 
     // tracking
     bool isTracking() const;
