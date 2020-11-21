@@ -7,16 +7,16 @@
 using namespace std;
 
 // Public constructor
-CT2::CT2(Hector::unitval totC, string pool){
+CT2::CT2(Hector::unitval total, string pool){
     track = false;
-    totalCarbon = totC;
+    this->total = total;
     ctmap[pool] = 1;
 }
 
 // Private constructor with explicit source pool map
-CT2::CT2(Hector::unitval totC, unordered_map<string, double> pool_map, bool do_track){
+CT2::CT2(Hector::unitval total, unordered_map<string, double> pool_map, bool do_track){
     track = do_track;
-    totalCarbon = totC;
+    this->total = total;
     ctmap = pool_map;
 }
 
@@ -47,7 +47,7 @@ double CT2::get_fraction(string source) const {
 }
 
 CT2 CT2::operator+(const CT2& flux){
-    Hector::unitval totC = totalCarbon + flux.totalCarbon;
+    Hector::unitval totC = total + flux.total;
     unordered_map<string, double> new_origins;
     
     if(track) {
@@ -55,7 +55,7 @@ CT2 CT2::operator+(const CT2& flux){
 
         // Look through *our* sources, and if any in other object, add
         for (auto itr = ctmap.begin(); itr != ctmap.end(); itr++) {
-            new_pools[itr->first] = totalCarbon * itr->second + flux.totalCarbon * flux.get_fraction(itr->first);
+            new_pools[itr->first] = total * itr->second + flux.total * flux.get_fraction(itr->first);
         }
         
         // Look through the *other* object sources, and if any NOT in our map, add
@@ -63,7 +63,7 @@ CT2 CT2::operator+(const CT2& flux){
         for (int i = 0; i < sources.size(); i++) {
             const string src = sources[i];
             if(ctmap.find(src) == ctmap.end()) {  // source that's not in our map
-                new_pools[src] = flux.totalCarbon * flux.get_fraction(src);
+                new_pools[src] = flux.total * flux.get_fraction(src);
             }
         }
         
@@ -79,34 +79,34 @@ CT2 CT2::operator+(const CT2& flux){
 
 // Because we track a total and source fractions, subtraction is trivial
 CT2 CT2::operator-(const Hector::unitval flux){
-    CT2 ct(totalCarbon - flux, ctmap, track);
+    CT2 ct(total - flux, ctmap, track);
     return ct;
  }
 
-// member (this object on left, double on right of operator) multiplication and division are trivial
+// member function (this object on left of operator, double on right)
 CT2 CT2::operator*(const double d){
-    CT2 ct(totalCarbon * d, ctmap, track);
+    CT2 ct(total * d, ctmap, track);
     return ct;
 }
-// when object on right, just flip and call member function
+// when object is on right, just flip and call member function
 CT2 operator*(double d, const CT2& ct){
     CT2 x = ct; // need to make non-const
     return x * d;
 }
 
+// division
 CT2 CT2::operator/(const double d){
-    CT2 ct(totalCarbon / d, ctmap, track);
+    CT2 ct(total / d, ctmap, track);
     return ct;
 }
 
 
-
+// printing
 ostream& operator<<(ostream &out, CT2 &ct ){
-    out << ct.totalCarbon << endl;
+    out << ct.total << endl;
     std::vector<std::string> sources = ct.get_sources();
     for (int i = 0; i < sources.size(); i++) {
         out << "\t" << sources[i] << ": " << ct.get_fraction(sources[i]) << endl;
     }
     return out;
 }
-

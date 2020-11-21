@@ -8,21 +8,15 @@
 using namespace std;
 
   /**
-   * \brief CarbonTracker Class: class to track origin of carbon in various carbon pools as it moves throughout the carbon cycle
-   * in simple climate model Hector
-   * 
+   * \brief CT2 Class: class to track origin of carbon (or whatever) in various carbon pools in simple climate model Hector
    * Designed so that it can be dropped in place of a unitval in the Hector C++ code base
    */
 
 class CT2 {
 
-    /**
-      *\brief parameterized constructor - initialize pools of carbon with pg carbon (unitvals)
-      *\param totC unitval (units pg C) that expresses total amount of carbon in the pool
-      *\param subPool Pool object to set as inital origin of carbon in the pool at time of creation
-      */
 public:
-    CT2(Hector::unitval totC, string subPool);
+    // public constructor (see private one below)
+    CT2(Hector::unitval total, string pool);
     
     // math operations
     CT2 operator+(const CT2& flux);
@@ -30,10 +24,10 @@ public:
     CT2 operator*(const double d);  // note corresponding non-member function declared below
     CT2 operator/(const double d);
 
+    // accessor functions
     vector<string> get_sources() const;
     double get_fraction(std::string source) const;
     double get_total() const;
-    unordered_map<string, double> get_source_map() const;
 
     // tracking
     bool isTracking() const;
@@ -44,14 +38,15 @@ public:
 
 
 private:
-     // Total amount of carbon in a pool represented by a CarbonTracker object - in petagrams carbon (U_PGC)
-    Hector::unitval totalCarbon;
-    // Unordered map holds the fractions of `totalCarbon` (map value) corresponding to each source pool (key)
+     // total amount of whatever we're tracking
+    Hector::unitval total;
+    // unordered map holds the fractions of `total` (map value) corresponding to each source pool (map key)
     unordered_map<string, double> ctmap;
+    // are we tracking?
     bool track;
     
     // internal constructor with explicit source pool map
-    CT2(Hector::unitval totC, unordered_map<string, double> pool_map, bool do_track);
+    CT2(Hector::unitval total, unordered_map<string, double> pool_map, bool do_track);
 };
 
 // Non-member function for multuplication with double as first argument

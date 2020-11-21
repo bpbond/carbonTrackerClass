@@ -345,6 +345,8 @@ int main(int argc, char* argv[]){
     CT2 y(carbon20, "y");
     y.setTracking(true);
     CT2 z = x + y;
+    cout << "x is " << x << endl;
+    cout << "y is " << y << endl;
     cout << "z is " << z << endl;
     z = z - carbon10;
     cout << "z is " << z << endl;
