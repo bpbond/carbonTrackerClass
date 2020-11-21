@@ -26,7 +26,7 @@ using namespace std;
 
    private:
 
-    // Total amount of carbon in a pool represented by a CarbonTracker object - in petagrams carbon (U-PGC)
+    // Total amount of carbon in a pool represented by a CarbonTracker object - in petagrams carbon (U_PGC)
     Hector::unitval totalCarbon;
 
     // array containing each of the sub-pools within Hector
