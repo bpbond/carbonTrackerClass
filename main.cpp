@@ -346,6 +346,15 @@ int main(int argc, char* argv[]){
     y.setTracking(true);
     CT2 z = x + y;
     cout << "z is " << z << endl;
+    z = z - carbon10;
+    cout << "z is " << z << endl;
+    CT2 z2 = z / 2;
+    cout << "z/2 is " << z2 << endl;
+    CT2 zpoint5 = z2 * 0.5;
+    cout << "z/2*0.5 is " << zpoint5 << endl;
+    const CT2 test = z;
+    CT2 twoxz = 2.0 * test;
+    cout << "2 * z is " << twoxz << endl;
     
     cout << "Time for Tests!" << endl;
     testTrackerStartsFalse();

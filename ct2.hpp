@@ -24,21 +24,19 @@ class CT2 {
 public:
     CT2(Hector::unitval totC, string subPool);
     
-    /**
-      * \brief addition between two carbon tracker objects (one pool and one flux)
-      *         - if tracking, then total carbon is the sum of the two total carbons and the map of the new CarbonTracker
-      *           object will reflect percentages of added pools
-      *         - else only the total carbon's will be added and the pool's array will be used (flux must be created using
-      *           fluxFromTrackerPool and if not tracking array will be all 0s)
-      * \param flux carbon tracker object that is being added to 'this', needs total carbon unitval (unit pg C)
-      * \returns CarbonTracker object with updated total carbon and map
-      */
+    // math operations
     CT2 operator+(const CT2& flux);
+    CT2 operator-(const Hector::unitval flux);
+    CT2 operator*(const double d);  // note corresponding non-member function declared below
+    CT2 operator/(const double d);
+
     vector<string> get_sources() const;
     double get_fraction(std::string source) const;
+    double get_total() const;
+    unordered_map<string, double> get_source_map() const;
 
+    // tracking
     bool isTracking() const;
-
     void setTracking(bool do_track);
 
     // pretty printing
@@ -55,5 +53,8 @@ private:
     // internal constructor with explicit source pool map
     CT2(Hector::unitval totC, unordered_map<string, double> pool_map, bool do_track);
 };
+
+// Non-member function for multuplication with double as first argument
+CT2 operator*(double d, const CT2& ct);
 
 #endif

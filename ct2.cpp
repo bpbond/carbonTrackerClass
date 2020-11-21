@@ -1,6 +1,6 @@
 
 #include <sstream>
-#include <unordered_map> 
+#include <unordered_map>
 #include "ct2.hpp"
 #include "unitval.hpp"
 
@@ -30,7 +30,6 @@ void CT2::setTracking(bool do_track){
 
 
 std::vector<std::string> CT2::get_sources() const {
-    H_ASSERT(track, "get_sources requires tracking to be turned on");
     std::vector<std::string> sources;
     for (auto itr = ctmap.begin(); itr != ctmap.end(); itr++) {
         sources.push_back(itr->first);
@@ -39,7 +38,6 @@ std::vector<std::string> CT2::get_sources() const {
 }
 
 double CT2::get_fraction(string source) const {
-    H_ASSERT(track, "get_fraction requires tracking to be turned on");
     double val = 0.0;  // 0.0 is returned if not in our map
     auto x = ctmap.find(source);
     if(x != ctmap.end()) {
@@ -79,6 +77,30 @@ CT2 CT2::operator+(const CT2& flux){
     return addedFlux;
 }
 
+// Because we track a total and source fractions, subtraction is trivial
+CT2 CT2::operator-(const Hector::unitval flux){
+    CT2 ct(totalCarbon - flux, ctmap, track);
+    return ct;
+ }
+
+// member (this object on left, double on right of operator) multiplication and division are trivial
+CT2 CT2::operator*(const double d){
+    CT2 ct(totalCarbon * d, ctmap, track);
+    return ct;
+}
+// when object on right, just flip and call member function
+CT2 operator*(double d, const CT2& ct){
+    CT2 x = ct; // need to make non-const
+    return x * d;
+}
+
+CT2 CT2::operator/(const double d){
+    CT2 ct(totalCarbon / d, ctmap, track);
+    return ct;
+}
+
+
+
 ostream& operator<<(ostream &out, CT2 &ct ){
     out << ct.totalCarbon << endl;
     std::vector<std::string> sources = ct.get_sources();
@@ -87,3 +109,4 @@ ostream& operator<<(ostream &out, CT2 &ct ){
     }
     return out;
 }
+
