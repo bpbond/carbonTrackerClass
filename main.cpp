@@ -1,6 +1,7 @@
 #include "carbonTracker.hpp"
 #include <iostream>     
 #include <cassert> 
+#include "ct2.hpp"
 
 using namespace std;
 
@@ -336,6 +337,16 @@ void testPrint(){
 
 
 int main(int argc, char* argv[]){
+    
+    Hector::unitval carbon10(10, Hector::U_PGC);
+    CT2 x(carbon10, "x");
+    x.setTracking(true);
+    Hector::unitval carbon20(20, Hector::U_PGC);
+    CT2 y(carbon20, "y");
+    y.setTracking(true);
+    CT2 z = x + y;
+    cout << "z is " << z << endl;
+    
     cout << "Time for Tests!" << endl;
     testTrackerStartsFalse();
     testIsTrackingAndStartTracking();
