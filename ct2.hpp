@@ -24,6 +24,7 @@ public:
     CT2 operator-(const CT2& ct);
     CT2 operator*(const double d);  // note corresponding non-member function declared below
     CT2 operator/(const double d);
+    bool operator==(const CT2& rhs);
 
     // accessor functions
     vector<string> get_sources() const;
