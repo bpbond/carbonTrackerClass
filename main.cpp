@@ -5,335 +5,101 @@
 
 using namespace std;
 
-bool sameCTArrays(double* arr1, double* arr2){
-    bool sameArrays = true;
-    for(int i = 0; i< CarbonTracker::LAST; ++i){
-        if(arr1[i] != arr2[i]){
-            sameArrays = false;
-        }
-        
-    }
-    return sameArrays;
-}
-
-void testTrackerStartsFalse(){
-    cout<<"Tracker Starts False Test"<<endl;
-    H_ASSERT(!CarbonTracker::isTracking(), "Track doesn't start off false");
-}
-
-void testCorrectConstructor(){
-    Hector::unitval carbon(10, Hector::U_PGC);
-    CarbonTracker soil1(carbon, CarbonTracker::SOIL);
-    double* originFracs1 = soil1.getOriginFracs();
-    bool correctArray = true;
-    for(int i = 0; i< CarbonTracker::LAST; ++i){
-        if(originFracs1[i] != 0 && i != CarbonTracker::SOIL){
-            correctArray = false;
-        }
-        if(i==CarbonTracker::SOIL && originFracs1[i] != 1){
-            correctArray = false;
-        }
-    }
-
-    cout<<"Simple Parameterized Array Tests"<<endl;
-    H_ASSERT(soil1.getTotalCarbon() == 10, "Wrong Carbon Amount Simple Constructor");
-    H_ASSERT(correctArray, "Wrong Carbon Fraction Array Simple Constructor")
-}
-
-void testWrongConstructor(){
-    cout<<"Error Simple Parameterized Array Tests"<<endl;
-    Hector::unitval carbon(10, Hector::U_UNITLESS);
-    CarbonTracker soil1(carbon, CarbonTracker::SOIL);
-}
-
-void testNegCarbonConstructor(){
-    cout<<"Error Simple Parameterized Array Tests"<<endl;
-    Hector::unitval carbon(-10, Hector::U_PGC);
-    CarbonTracker soil1(carbon, CarbonTracker::SOIL);
-}
-
-void testCopyConstructor(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker ct1(carbon10, CarbonTracker::SOIL);
-    CarbonTracker ct2(ct1);
-    double* originFracs1 = ct1.getOriginFracs();
-    double* originFracs2 = ct2.getOriginFracs();
-
-    cout<<"Copy Constructor Test" <<endl;
-    H_ASSERT(ct1.getTotalCarbon() == ct2.getTotalCarbon(), "Copy constructor total carbon doesn't work");
-    H_ASSERT(sameCTArrays(originFracs1, originFracs2), "Copy constructor arrays don't work");
-}
-
-void testAssignmentOperator(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker ct1(carbon10, CarbonTracker::SOIL);
-    Hector::unitval carbon20(20, Hector::U_PGC);
-    CarbonTracker ct2(carbon20, CarbonTracker::SOIL);
-    ct2=ct1;
-    double* originFracs1 = ct1.getOriginFracs();
-    double* originFracs2 = ct2.getOriginFracs();
-
-    cout<<"Assignment Operator Test" <<endl;
-    H_ASSERT(ct1.getTotalCarbon() == ct2.getTotalCarbon(), "Assignment Operator total carbon doesn't work");
-    H_ASSERT(sameCTArrays(originFracs1, originFracs2), "Assignment Operator arrays don't work");
-}
-
-void testIsTrackingAndStartTracking(){
-    cout<<"Is Tracking and Start Tracking Tests"<<endl;
-    H_ASSERT(!CarbonTracker::isTracking(), "track is not retrieved");
-    CarbonTracker::startTracking();
-    H_ASSERT(CarbonTracker::isTracking(), "startTracking doesn't work");
-    CarbonTracker::stopTracking();
-    H_ASSERT(!CarbonTracker::isTracking(), "stopTracking doesn't work");
-
-}
-
-void testAddOperator(){
-    cout<< "Add Operator Test" << endl;
-
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil(carbon10, CarbonTracker::SOIL);
-    Hector::unitval carbon5(5, Hector::U_PGC);
-    CarbonTracker atmos(carbon10, CarbonTracker::ATMOSPHERE);
-    CarbonTracker atmosFlux5 = atmos.fluxFromTrackerPool(carbon5);
-
-    CarbonTracker soilNew = soil + atmosFlux5;
-    Hector::unitval carbon15(15, Hector::U_PGC);
-    H_ASSERT(soilNew.getTotalCarbon() == carbon15, "frozen addition doesn't add total carbon correctly");
-    H_ASSERT(sameCTArrays(soilNew.getOriginFracs(), soil.getOriginFracs()), "frozen arrays don't work correctly when adding");
-
-    CarbonTracker::startTracking();
-    Hector::unitval carbon20(20, Hector::U_PGC);
-    double arr[] = {0.5, 0.5, 0, 0};
-    CarbonTracker testCT = soil + atmos;
-    CarbonTracker::stopTracking();
+void test_tracking(){
+    cout << "test_tracking" << endl;
+    CT2 x(Hector::unitval(), "x");
+    H_ASSERT(!x.isTracking(), "Tracker doesn't start off false");
+    x.setTracking(true);
+    H_ASSERT(x.isTracking(), "Turning on tracking doesn't work");
+    x.setTracking(false);
+    H_ASSERT(!x.isTracking(), "Turning off tracking doesn't work");
     
-    H_ASSERT(testCT.getTotalCarbon() == carbon20, "total carbon doesn't add right when tracking");
-    H_ASSERT(sameCTArrays(testCT.getOriginFracs(), arr), "Arrays don't add right when tracking");
+    x.setTracking(true);
+    CT2 y(Hector::unitval(), "y");
+    // TODO: test that this throws a 'tracking mismatch' error
 }
 
-void testFrozenPoolAddPool(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil(carbon10, CarbonTracker::SOIL);
-    CarbonTracker soilNew = soil + soil;
-}
-
-void testUnitValSubtractOperator(){
-    Hector::unitval carbon30(30, Hector::U_PGC);
-    CarbonTracker soil(carbon30, CarbonTracker::SOIL);
-    Hector::unitval carbon10(10, Hector::U_PGC);
-
-    Hector::unitval carbon20(20, Hector::U_PGC);
-    double arr[] = {1, 0, 0, 0};
-    CarbonTracker testCT = soil - carbon10;
-
-    cout<< "Subtract Operator Test" << endl;
-    H_ASSERT(testCT.getTotalCarbon() == carbon20, "total carbon doesn't add right");
-    H_ASSERT(sameCTArrays(testCT.getOriginFracs(), arr), "Arrays don't add right");
-}
-
-void testWrongSubtraction(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil(carbon10, CarbonTracker::SOIL);
-    Hector::unitval carbon30(30, Hector::U_PGC);
-
-    //Throws an error
-    CarbonTracker testCT = soil - carbon30;
-}
-
-void testSubtractionWithArray(){
-    CarbonTracker::startTracking();
-    Hector::unitval carbon30(30, Hector::U_PGC);
-    CarbonTracker soil30(carbon30, CarbonTracker::SOIL);
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-
-    Hector::unitval carbon20(20, Hector::U_PGC);
-    double arr1[] = {1, 0, 0, 0};
-    CarbonTracker testCT1 = soil30 - soil10;
-
-    Hector::unitval carbon40(40, Hector::U_PGC);
-    CarbonTracker atmos40(carbon40, CarbonTracker::ATMOSPHERE);
-    CarbonTracker atmosSoil = atmos40+soil30;
-    CarbonTracker testCT2 = atmosSoil - soil10;
-    Hector::unitval carbon60(60, Hector::U_PGC);
-    double arr2[] = {1.0/3, 2.0/3, 0, 0};
-
-    cout<< "Subtraction Array Operator Test" << endl;
-    H_ASSERT(testCT1.getTotalCarbon() == carbon20, "total carbon doesn't subtract right");
-    H_ASSERT(sameCTArrays(testCT1.getOriginFracs(), arr1), "Arrays don't subtract right");
-    H_ASSERT(testCT2.getTotalCarbon() == carbon60, "total carbon doesn't subtract right - complicated example");
-    H_ASSERT(sameCTArrays(testCT2.getOriginFracs(), arr2), "Arrays don't subtract right - complicated example");
-    CarbonTracker::stopTracking();
-}
-
-void testMultiplication(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    double arr1[] = {1, 0, 0, 0};
-
-    CarbonTracker soil5 = soil10 * 0.5;
-    CarbonTracker soil20 = 2 * soil10;
-
-    cout<< "Multiplication Operator Test" << endl;
-    H_ASSERT(soil5.getTotalCarbon() == 5, "multiplication ct*double doesn't work");
-    H_ASSERT(sameCTArrays(soil5.getOriginFracs(), arr1), "multiplication messes up arrays for ct*double");
-    H_ASSERT(soil20.getTotalCarbon() == 20, "multiplication double*ct doesn't work");
-    H_ASSERT(sameCTArrays(soil20.getOriginFracs(), arr1), "multiplication messes up arrays for ct*double");
-}
-
-void testDivision(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    double arr1[] = {1, 0, 0, 0};
-
-    CarbonTracker soil5 = soil10/2;
-
-    cout<< "Division Operator Test" << endl;
-    H_ASSERT(soil5.getTotalCarbon() == 5, "multiplication ct*double doesn't work");
-    H_ASSERT(sameCTArrays(soil5.getOriginFracs(), arr1), "multiplication messes up arrays for ct*double");
-}
-void testDivisionBy0(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    CarbonTracker soil5 = soil10/0;
-}
-
-void testSetCarbon(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    Hector::unitval carbon20(20, Hector::U_PGC);
-    soil10.setTotalCarbon(carbon20);
-    double arr1[] = {1, 0, 0, 0};
-    cout<< "setTotalCarbon Test" << endl;
-    H_ASSERT(soil10.getTotalCarbon() == 20, "setTotalCarbon Ddesn't work");
-    H_ASSERT(sameCTArrays(soil10.getOriginFracs(), arr1), "setTotalCarbon changes the array");
-}
-
-void testWrongSetCarbon(){
-    Hector::unitval year10(10, Hector::U_YRS);
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    soil10.setTotalCarbon(year10);
-}
-void negativeSetCarbon(){
-    Hector::unitval negCarbon10(-10, Hector::U_PGC);
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    soil10.setTotalCarbon(negCarbon10);
-}
-
-void testGetTotalCarbon(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    Hector::unitval carbonGetter = soil10.getTotalCarbon();
-
-    cout<< "getTotalCarbon Test" << endl;
-    H_ASSERT(carbonGetter == 10, "Amount of carbon from getter is wrong");
-    H_ASSERT(carbonGetter.units() == Hector::U_PGC, "unites from total carbon getter are wrong");
-}
-
-void testGetOriginFracs(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    Hector::unitval carbon40(40, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    CarbonTracker atmos40(carbon40, CarbonTracker::ATMOSPHERE);
-    double soil[] = {1, 0, 0, 0};
-    double atmos[] = {0, 1, 0, 0};
-
-    cout<< "getOriginFracs Test" << endl;
-    H_ASSERT(sameCTArrays(soil10.getOriginFracs(), soil), "Doesn't get first element of array correctly");
-    H_ASSERT(sameCTArrays(atmos40.getOriginFracs(), atmos), "Doesn't get second (past first) element of array correctly");
-}
-
-void testGetPoolCarbon(){
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    Hector::unitval carbon40(40, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    CarbonTracker atmos40(carbon40, CarbonTracker::ATMOSPHERE);
+void test_get_sources(){
+    cout << "test_get_sources" << endl;
+    Hector::unitval c1(1, Hector::U_PGC);
+    CT2 x(c1, "x");
+    // TODO: test that x throws an error if we try to get_sources() w/o tracking on
+    x.setTracking(true);
+    vector<string> x_sources = x.get_sources();
+    H_ASSERT(x_sources.size() == 1, "wrong size");
+    H_ASSERT(x_sources[0] == "x", "wrong source");
     
-    cout<< "getPoolCarbon Test" << endl;
-    H_ASSERT(soil10.getPoolCarbon(CarbonTracker::SOIL) == 10, "Doesn't get first element's value correctly");
-    H_ASSERT(soil10.getPoolCarbon(CarbonTracker::SOIL).units() == Hector::U_PGC, "Doesn't get first element's units correctly"); 
-
-    H_ASSERT(atmos40.getPoolCarbon(CarbonTracker::ATMOSPHERE) == 40, "Doesn't get second element's value correctly");
-    H_ASSERT(atmos40.getPoolCarbon(CarbonTracker::ATMOSPHERE).units() == Hector::U_PGC, "Doesn't get second element's units correctly"); 
+    CT2 y(c1, "y");
+    y.setTracking(true);
+    CT2 z = x + y;
+    vector<string> z_sources = z.get_sources();
+    H_ASSERT(z_sources.size() == 2, "wrong size");
+    H_ASSERT(z_sources[0] == "x", "wrong source");
+    H_ASSERT(z_sources[1] == "y", "wrong source");
 }
 
-void testFluxFromTrackerPool(){
-    cout<<"fluxFromTrackerPoolTests"<<endl;
-    double zeroArr[] = {0,0,0,0}; 
-    Hector::unitval carbon5(5, Hector::U_PGC);
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    CarbonTracker frozenFlux5 = soil10.fluxFromTrackerPool(carbon5);  
-    H_ASSERT(frozenFlux5.getTotalCarbon() == 5, "Flux has the wrong amount of carbon when frozen");
-    H_ASSERT(sameCTArrays(frozenFlux5.getOriginFracs(), zeroArr), "When frozen the flux array isn't zero!");
-
-    CarbonTracker::startTracking();
-    CarbonTracker flux10 = soil10.fluxFromTrackerPool(carbon10);
-    CarbonTracker flux5 = soil10.fluxFromTrackerPool(carbon5);
-
-    H_ASSERT(flux10.getTotalCarbon() == 10, "Flux has the wrong amount of carbon");
-    H_ASSERT(sameCTArrays(flux10.getOriginFracs(), soil10.getOriginFracs()), "Flux changes the array from the origin");
-
-    H_ASSERT(flux5.getTotalCarbon() == 5, "Flux has the wrong amount of carbon");
-    H_ASSERT(sameCTArrays(flux5.getOriginFracs(), soil10.getOriginFracs()), "Flux changes the array from the origin");
-    CarbonTracker::stopTracking();
+void test_get_total(){
+    cout << "test_get_total" << endl;
+    Hector::unitval c1(1, Hector::U_PGC);
+    CT2 x(c1, "x");
+    Hector::unitval total = x.get_total();
+    H_ASSERT(total == c1, "Total doesn't match");
 }
 
-void testWrongFluxFromTrackerPoolSize(){ 
-    Hector::unitval carbon5(5, Hector::U_PGC);
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil5(carbon5, CarbonTracker::SOIL);
-    CarbonTracker flux10 = soil5.fluxFromTrackerPool(carbon10);
+void test_get_fraction(){
+    cout << "test_get_fraction" << endl;
+    Hector::unitval c1(1, Hector::U_PGC);
+    CT2 x(c1, "x");
+    // TODO: test that x throws an error if we try to get_fraction() w/o tracking on
+    x.setTracking(true);
+    double frac = x.get_fraction("x");
+    H_ASSERT(frac == 1, "initial frac not 1");
 }
 
-void testWrongFluxFromTrackerPoolUnits(){ 
-    Hector::unitval carbon5(5, Hector::U_PGC);
-    Hector::unitval year10(10, Hector::U_YRS);
-    CarbonTracker soil5(carbon5, CarbonTracker::SOIL);
-    CarbonTracker flux10 = soil5.fluxFromTrackerPool(year10);
+void test_addition(){
+    cout << "test_addition" << endl;
+    Hector::unitval c1(1, Hector::U_PGC);
+    CT2 x(c1, "x");
+    CT2 y(c1, "y");
+    
+    // addtion without tracking
+    CT2 z = x + y;
+    Hector::unitval c2 = c1 + c1;
+    H_ASSERT(z.get_total() == c2, "untracked total not right");
+    
+    // tracking mismatch
+    x.setTracking(true);
+    // TODO: addition throws tracking mismatch error
+    x.setTracking(false);
+    y.setTracking(true);
+    // TODO: addition throws tracking mismatch error
+    
+    // addition with tracking
+    x.setTracking(true);
+    y.setTracking(true);
+    z = x + y;
+    H_ASSERT(z.get_total() == c2, "tracked total not right");
+    H_ASSERT(z.get_fraction("x") == 0.5, "x fraction not right");
+    H_ASSERT(z.get_fraction("y") == 0.5, "x fraction not right");
+    
+    z = z + x;
+    H_ASSERT(z.get_total() == c1 + c2, "tracked total not right");
+    double xfrac = z.get_fraction("x");
+    double yfrac = z.get_fraction("y");
+    H_ASSERT(xfrac == yfrac * 2, "x/y fractions not right");
+    
+    // add 0
+    Hector::unitval c0(0, Hector::U_PGC);
+    CT2 zero(c0, "zero");
+    zero.setTracking(true);
+    CT2 x2 = x + zero;
+    H_ASSERT(x == x2, "adding zero doesn't work");
+    H_ASSERT(x2.get_fraction("x") == 1, "x2 fraction not right");
+    
+    // add 0 and 0
+    CT2 zerozero = zero + zero;
+    H_ASSERT(zerozero == zero, "adding zeros doesn't work");
 }
-
-void testFluxFromTrackerPoolWithArray(){ 
-    cout<<"fluxFromTrackerPoolTests when you set the array"<<endl;
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    CarbonTracker atmos10(carbon10, CarbonTracker::ATMOSPHERE);
-    double arrFlux[] = {0.6, 0.4, 0, 0};
-    double frozenArrFlux[] = {0,0,0,0};
-    CarbonTracker flux10Frozen = soil10.fluxFromTrackerPool(carbon10, arrFlux);
-    H_ASSERT(sameCTArrays(frozenArrFlux, flux10Frozen.getOriginFracs()), "When not tracking, flux array isn't all set to 0s");
-    H_ASSERT(flux10Frozen.getTotalCarbon() == 10, "Flux not set correctly");
-
-     CarbonTracker::startTracking();
-     CarbonTracker soilAtmos20 = soil10 + atmos10;
-     CarbonTracker flux10 = soilAtmos20.fluxFromTrackerPool(carbon10, arrFlux);
-    H_ASSERT(flux10.getTotalCarbon() == carbon10, "flux from array and unitval doesn't add total carbon correctly");
-    H_ASSERT(sameCTArrays(flux10.getOriginFracs(), arrFlux), "flux from array and unitval doesn't add total carbon correctly");
-     CarbonTracker::stopTracking();
-}
-
-void testPrint(){
-    CarbonTracker::startTracking();
-    Hector::unitval carbon10(10, Hector::U_PGC);
-    Hector::unitval carbon5(5, Hector::U_PGC);
-    CarbonTracker soil10(carbon10, CarbonTracker::SOIL);
-    CarbonTracker atmos10(carbon10, CarbonTracker::ATMOSPHERE);
-    CarbonTracker deepOcean10(carbon10, CarbonTracker::DEEPOCEAN);
-    CarbonTracker topOcean10(carbon10, CarbonTracker::TOPOCEAN);
-    CarbonTracker soilFlux5 = soil10.fluxFromTrackerPool(carbon5);
-    CarbonTracker atmosFlux10 = atmos10.fluxFromTrackerPool(carbon10);
-    CarbonTracker deepOceanFlux5 = deepOcean10.fluxFromTrackerPool(carbon5);
-    topOcean10 = topOcean10 + soilFlux5 + atmosFlux10 + deepOceanFlux5;
- 
-    cout<<topOcean10<<endl;
-
-
-}
-
-
 
 
 int main(int argc, char* argv[]){
@@ -345,7 +111,7 @@ int main(int argc, char* argv[]){
     CT2 y(carbon20, "y");
     y.setTracking(true);
     CT2 z = x + y;
-        
+    
     cout << "x is " << x << endl;
     cout << "y is " << y << endl;
     cout << "z is " << z << endl;
@@ -359,45 +125,26 @@ int main(int argc, char* argv[]){
     CT2 twoxz = 2.0 * test;
     cout << "2 * z is " << twoxz << endl;
     
+    cout << "\n*** SIMULATION ***\n" << endl;
     CT2 dest(carbon10, "dest");
     dest.setTracking(true);
+    cout << "z = " << z << endl;
+    cout << "dest = " << dest << endl;
     for(int i = 0; i < 5; i++) {
+        cout << "----------------- i = " << i << endl;
+        cout << "z = " << z << endl;
         CT2 flux = z * 0.1;
         z = z - flux;
         dest = dest + flux;
-        cout << "----------------- i = " << i << endl;
+        cout << "flux from z to dest = " << flux << endl;
         cout << "z = " << z << endl;
-        cout << "flux = " << flux << endl;
         cout << "dest = " << dest << endl;
     }
     
     cout << "Time for Tests!" << endl;
-    testTrackerStartsFalse();
-    testIsTrackingAndStartTracking();
-    testCorrectConstructor();
-    //testWrongConstructor();
-    //testNegCarbonConstructor();
-    testCopyConstructor();
-    testAssignmentOperator();
-    testAddOperator();
-    //testFrozenPoolAddPool();
-    testUnitValSubtractOperator();
-    //testWrongSubtraction();
-    testSubtractionWithArray();
-    testMultiplication();
-    testDivision();
-    //testDivisionBy0();
-    testSetCarbon();
-    //testWrongSetCarbon();
-    //negativeSetCarbon();
-    testGetTotalCarbon();
-    testGetOriginFracs();
-    testGetPoolCarbon();
-    testFluxFromTrackerPool();
-    testFluxFromTrackerPoolWithArray();
-    //testWrongFluxFromTrackerPoolSize();
-    //testWrongFluxFromTrackerPoolUnits();
-    testPrint();
-
-    }
-
+    test_tracking();
+    test_get_sources();
+    test_get_total();
+    test_get_fraction();
+    test_addition();
+}
