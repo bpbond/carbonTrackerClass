@@ -101,6 +101,97 @@ void test_addition(){
     H_ASSERT(zerozero == zero, "adding zeros doesn't work");
 }
 
+void test_subtraction(){
+    cout << "test_subtraction" << endl;
+    Hector::unitval c0(0, Hector::U_PGC);
+    Hector::unitval c1(1, Hector::U_PGC);
+    CT2 x(c1, "x");
+    x.setTracking(true);
+    CT2 y = x - x;
+    H_ASSERT(y.get_total() == c0, "CT2 subtraction doesn't work");
+    H_ASSERT(y.get_fraction("x") == x.get_fraction("x"), "fractions not preserved");
+    
+    // can also subtract a unitval
+    CT2 y2 = x - c1;
+    H_ASSERT(y.get_total() == y2.get_total(), "unitval subtraction doesn't work");
+    CT2 x2 = x - c0;
+    H_ASSERT(x.get_total() == x2.get_total(), "unitval 0 subtraction doesn't work");
+}
+
+void test_mult_div(){
+    cout << "test_multiplication and division" << endl;
+    Hector::unitval c0(0, Hector::U_PGC);
+    Hector::unitval c1(1, Hector::U_PGC);
+    Hector::unitval c2(2, Hector::U_PGC);
+    CT2 x(c2, "x");
+    x.setTracking(true);
+    
+    CT2 x2 = x * 2;
+    H_ASSERT(x2.get_total() == x.get_total() * 2.0, "member multiplication doesn't work");
+    H_ASSERT(x.get_fraction("x") == x2.get_fraction("x"), "mult fractions not preserved");
+    CT2 x2a = 2 * x;
+    H_ASSERT(x2.get_total() == x2a.get_total(), "nonmember mult doesn't work");
+    x2 = x / 2.0;
+    H_ASSERT(x2.get_total() == x.get_total() / 2.0, "division doesn't work");
+    H_ASSERT(x.get_fraction("x") == x2.get_fraction("x"), "div fractions not preserved");
+    CT2 x5a = x * 0.2;
+    CT2 x5b = x / 5.0;
+    H_ASSERT(x5a.get_total() == x5b.get_total(), "mult or division doesn't work");
+    CT2 x1 = x * 1;
+    H_ASSERT(x1.get_total() == x.get_total(), "multiplication identity doesn't work");
+    x1 = x / 1;
+    H_ASSERT(x1.get_total() == x.get_total(), "division identity doesn't work");
+    CT2 x0 = x * 0;
+    H_ASSERT(x0.get_total() == c0, "multiplication by zero doesn't work");
+    x0 = x / 0;
+    H_ASSERT(isinf(x0.get_total()), "division by zero doesn't work");
+    
+}
+
+void test_equality(){
+    cout << "test_equality" << endl;
+    Hector::unitval c1(1, Hector::U_PGC);
+    CT2 x(c1, "x");
+    CT2 y(c1, "x");
+    
+    H_ASSERT(x == y, "equality doesn't work");
+    H_ASSERT(!(x != y), "inequality doesn't work");
+    y = x * 2;
+    H_ASSERT(x != y, "equality doesn't work");
+    H_ASSERT(!(x == y), "inequality doesn't work");
+}
+
+void test_identicality(){
+    cout << "test_identicality" << endl;
+    Hector::unitval c1(1, Hector::U_PGC);
+    CT2 x(c1, "x");
+    CT2 x1(c1, "x");
+    CT2 y(c1, "y");
+    
+    H_ASSERT(x.identical(x1), "identical doesn't work");
+    
+    x.setTracking(true);
+    H_ASSERT(!x.identical(x1), "identical tracking doesn't work");
+    H_ASSERT(!x1.identical(x), "identical tracking doesn't work");
+    x1.setTracking(true);
+    H_ASSERT(x.identical(x1), "identical tracking doesn't work");
+    x.setTracking(false);
+    H_ASSERT(!x.identical(x1), "identical tracking doesn't work");
+    H_ASSERT(!x1.identical(x), "identical tracking doesn't work");
+    x.setTracking(true);
+
+    // different sources
+    y.setTracking(true);
+    H_ASSERT(!x.identical(y), "identical sources doesn't work");
+    H_ASSERT(!y.identical(x), "identical sources doesn't work");
+
+    // different fraction
+    Hector::unitval c0(0, Hector::U_PGC);
+    CT2 x0(c0, "x");
+    x0.setTracking(true);
+    H_ASSERT(!x.identical(x0), "identical fractions doesn't work");
+    H_ASSERT(!x0.identical(x), "identical fractions doesn't work");
+}
 
 int main(int argc, char* argv[]){
     
@@ -147,4 +238,8 @@ int main(int argc, char* argv[]){
     test_get_total();
     test_get_fraction();
     test_addition();
+    test_subtraction();
+    test_mult_div();
+    test_equality();
+    test_identicality();
 }
