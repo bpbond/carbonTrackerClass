@@ -127,15 +127,28 @@ CT2 CT2::operator/(const double d){
     return ct;
 }
 
-// Equality: same total, same sources, same fractions
+// Equality: same total only
 bool CT2::operator==(const CT2& rhs){
-    bool same = total == rhs.get_total();
+    return total == rhs.get_total();
+}
+bool CT2::operator!=(const CT2& rhs){
+    return total != rhs.get_total();
+}
+
+// Identicality: same total, same tracking, same sources, same fractions
+bool CT2::identical(CT2 x) const {
+    bool same = total == x.get_total();
     
-    std::vector<std::string> sources = rhs.get_sources();
-    same = same || get_sources() == sources;
+    same = same && x.isTracking() == track;
     
-    for (int i = 0; i < sources.size(); i++) {
-        same = same || ctmap.at(sources[i]) == rhs.get_fraction(sources[i]);
+    if(x.isTracking() && track) {
+        std::vector<std::string> xsources = x.get_sources();
+        std::vector<std::string> sources = get_sources();
+        same = same && xsources == sources;
+        
+        for (int i = 0; i < xsources.size(); i++) {
+            same = same && x.get_fraction(xsources[i]) == get_fraction(sources[i]);
+        }
     }
 
     return same;
