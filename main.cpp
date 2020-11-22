@@ -2,6 +2,7 @@
 #include <iostream>     
 #include <cassert> 
 #include "ct2.hpp"
+#include <chrono>
 
 using namespace std;
 
@@ -179,12 +180,12 @@ void test_identicality(){
     H_ASSERT(!x.identical(x1), "identical tracking doesn't work");
     H_ASSERT(!x1.identical(x), "identical tracking doesn't work");
     x.setTracking(true);
-
+    
     // different sources
     y.setTracking(true);
     H_ASSERT(!x.identical(y), "identical sources doesn't work");
     H_ASSERT(!y.identical(x), "identical sources doesn't work");
-
+    
     // different fraction
     Hector::unitval c0(0, Hector::U_PGC);
     CT2 x0(c0, "x");
@@ -216,7 +217,7 @@ int main(int argc, char* argv[]){
     CT2 twoxz = 2.0 * test;
     cout << "2 * z is " << twoxz << endl;
     
-    cout << "\n*** SIMULATION ***\n" << endl;
+    cout << "\n---------- SIMULATION ----------\n" << endl;
     CT2 dest(carbon10, "dest");
     dest.setTracking(true);
     cout << "z = " << z << endl;
@@ -232,7 +233,25 @@ int main(int argc, char* argv[]){
         cout << "dest = " << dest << endl;
     }
     
-    cout << "Time for Tests!" << endl;
+    cout << "\n---------- TIMING ----------\n" << endl;
+    
+    for(int tracking = 0; tracking <= 1; tracking++) {
+        x = CT2(carbon10, "x");
+        x.setTracking(tracking);
+        y = CT2(carbon10, "y");
+        x.setTracking(tracking);
+        auto start = std::chrono::high_resolution_clock::now();
+        for(int i = 0; i < 1000; i++) {
+            CT2 flux = x * 0.01;
+            x = x - flux;
+            y = y + flux;
+        }
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+        cout << "tracking = " << tracking << " time = " << duration.count() << endl;
+    }
+    
+    cout << "\n---------- Time for Tests! ----------\n" << endl;
     test_tracking();
     test_get_sources();
     test_get_total();
