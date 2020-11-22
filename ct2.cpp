@@ -19,8 +19,10 @@ CT2::CT2(Hector::unitval total, unordered_map<string, double> pool_map, bool do_
     this->total = total;
     ctmap = pool_map;
     
+    // check pool_map data
     double frac = 0.0;
     for (auto itr = ctmap.begin(); itr != ctmap.end(); itr++) {
+        H_ASSERT(itr->second >= 0 && itr->second <= 1, "fractions must be 0-1");
         frac += itr->second;
     }
     H_ASSERT(frac - 1.0 < 1e-6, "pool_map must sum to ~1.0")
