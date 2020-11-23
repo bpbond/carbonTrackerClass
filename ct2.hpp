@@ -54,7 +54,7 @@ private:
     CT2(Hector::unitval total, unordered_map<string, double> pool_map, bool do_track);
 };
 
-// Non-member function for multuplication with double as first argument
+// Non-member function for multiplication with double as first argument
 CT2 operator*(double d, const CT2& ct);
 
 #endif

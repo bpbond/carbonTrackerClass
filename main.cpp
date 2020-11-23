@@ -1,4 +1,3 @@
-#include "carbonTracker.hpp"
 #include <iostream>     
 #include <cassert> 
 #include "ct2.hpp"
@@ -198,6 +197,7 @@ int main(int argc, char* argv[]){
     
     Hector::unitval carbon10(10, Hector::U_PGC);
     CT2 x(carbon10, "x");
+    cout << "x is " << x << endl;
     x.setTracking(true);
     Hector::unitval carbon20(20, Hector::U_PGC);
     CT2 y(carbon20, "y");

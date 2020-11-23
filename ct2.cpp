@@ -158,8 +158,9 @@ bool CT2::identical(CT2 x) const {
 
 // Printing
 ostream& operator<<(ostream &out, CT2 &ct ){
-    out << ct.total << endl;
+    out << ct.total;
     if(ct.isTracking()) {
+        out << endl;
         std::vector<std::string> sources = ct.get_sources();
         for (int i = 0; i < sources.size(); i++) {
             out << "\t" << sources[i] << ": " << ct.get_fraction(sources[i]) << endl;
