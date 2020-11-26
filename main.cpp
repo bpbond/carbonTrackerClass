@@ -5,25 +5,37 @@
 
 using namespace std;
 
+#define ASSERT_NOTHROW(zzz,msg){\
+bool thrown=false; \
+try{zzz;} \
+catch (h_exception e) {thrown=true;} \
+H_ASSERT(thrown, msg); \
+}
+
+void test_creation() {
+    cout << "test_creation" << endl;
+    CT2 x(Hector::unitval(), "x");
+    H_ASSERT(!x.isTracking(), "Tracker doesn't start off false");
+    H_ASSERT(x.get_total() == Hector::unitval(), "Total isn't unitval");
+    x.setTracking(true);
+    H_ASSERT(x.get_fraction("x") == 1.0, "x fraction isn't 1");
+}
+
 void test_tracking(){
     cout << "test_tracking" << endl;
     CT2 x(Hector::unitval(), "x");
-    H_ASSERT(!x.isTracking(), "Tracker doesn't start off false");
     x.setTracking(true);
     H_ASSERT(x.isTracking(), "Turning on tracking doesn't work");
     x.setTracking(false);
     H_ASSERT(!x.isTracking(), "Turning off tracking doesn't work");
-    
-    x.setTracking(true);
-    CT2 y(Hector::unitval(), "y");
-    // TODO: test that this throws a 'tracking mismatch' error
 }
 
 void test_get_sources(){
     cout << "test_get_sources" << endl;
     Hector::unitval c1(1, Hector::U_PGC);
     CT2 x(c1, "x");
-    // TODO: test that x throws an error if we try to get_sources() w/o tracking on
+    ASSERT_NOTHROW(x.get_sources(), "get_sources didn't throw exception");
+        
     x.setTracking(true);
     vector<string> x_sources = x.get_sources();
     H_ASSERT(x_sources.size() == 1, "wrong size");
@@ -50,7 +62,7 @@ void test_get_fraction(){
     cout << "test_get_fraction" << endl;
     Hector::unitval c1(1, Hector::U_PGC);
     CT2 x(c1, "x");
-    // TODO: test that x throws an error if we try to get_fraction() w/o tracking on
+    ASSERT_NOTHROW(x.get_fraction("x"), "get_fraction didn't throw exception")
     x.setTracking(true);
     double frac = x.get_fraction("x");
     H_ASSERT(frac == 1, "initial frac not 1");
@@ -69,11 +81,11 @@ void test_addition(){
     
     // tracking mismatch
     x.setTracking(true);
-    // TODO: addition throws tracking mismatch error
+    ASSERT_NOTHROW(x + y, "addition didn't throw mismatch exception")
     x.setTracking(false);
     y.setTracking(true);
-    // TODO: addition throws tracking mismatch error
-    
+    ASSERT_NOTHROW(x + y, "addition didn't throw mismatch exception")
+
     // addition with tracking
     x.setTracking(true);
     y.setTracking(true);
@@ -252,6 +264,7 @@ int main(int argc, char* argv[]){
     }
     
     cout << "\n---------- Time for Tests! ----------\n" << endl;
+    test_creation();
     test_tracking();
     test_get_sources();
     test_get_total();
