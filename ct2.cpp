@@ -94,7 +94,7 @@ CT2 CT2::operator+(const CT2& flux){
             }
         }
     } else {
-        H_ASSERT(!track, "tracking mismatch")
+        H_ASSERT(!flux.isTracking(), "tracking mismatch")
     }
     
     CT2 addedFlux(new_total, new_origins, track);

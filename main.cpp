@@ -239,7 +239,7 @@ int main(int argc, char* argv[]){
         x = CT2(carbon10, "x");
         x.setTracking(tracking);
         y = CT2(carbon10, "y");
-        x.setTracking(tracking);
+        y.setTracking(tracking);
         auto start = std::chrono::high_resolution_clock::now();
         for(int i = 0; i < 1000; i++) {
             CT2 flux = x * 0.01;
